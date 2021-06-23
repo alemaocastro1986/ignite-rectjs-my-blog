@@ -2,18 +2,23 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
+import Prismic from '@prismicio/client';
 
 import { RichText } from 'prismic-dom';
+import { Fragment } from 'react';
+
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 
 interface Post {
+  uid: string;
   first_publication_date: string | null;
   data: {
     title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
@@ -29,16 +34,25 @@ interface Post {
 
 interface PostProps {
   post: Post;
-  readingTime: number;
 }
 
-export default function Post({ post, readingTime }: PostProps): JSX.Element {
-  const { query } = useRouter();
+export default function Post({ post }: PostProps): JSX.Element {
+  const { isFallback } = useRouter();
 
-  return (
+  const readingTime = Math.ceil(
+    post.data.content.reduce((acc, item) => {
+      const bodyCount = RichText.asText(item.body).split(/\s+/g).length;
+      const headingCount = String(item.heading).split(/\s+/g).length;
+      return acc + (bodyCount + headingCount);
+    }, 0) / 200
+  );
+
+  return isFallback ? (
+    <h1>Carregando...</h1>
+  ) : (
     <>
       <Head>
-        <title>spacetravelling | {query.slug}</title>
+        <title>spacetravelling | {post.data.title}</title>
       </Head>
       <article>
         <header className={styles.banner}>
@@ -51,7 +65,10 @@ export default function Post({ post, readingTime }: PostProps): JSX.Element {
               <ul>
                 <li>
                   <FiCalendar size={16} />
-                  {post.first_publication_date}
+                  {format(
+                    new Date(post.first_publication_date).getTime(),
+                    'dd MMM yyyy'
+                  ).toLowerCase()}
                 </li>
                 <li>
                   <FiUser size={16} />
@@ -59,10 +76,22 @@ export default function Post({ post, readingTime }: PostProps): JSX.Element {
                 </li>
                 <li>
                   <FiClock size={16} />
-                  {readingTime} min
+                  {String(readingTime)} min
                 </li>
               </ul>
             </header>
+
+            {post.data.content.map(data => (
+              <section key={data.heading}>
+                <h4>{data.heading}</h4>
+                {data.body.map(({ text }, index) => (
+                  <Fragment key={`${data.heading}-${String(index)}`}>
+                    <p>{text}</p>
+                    <br />
+                  </Fragment>
+                ))}
+              </section>
+            ))}
           </main>
         </div>
       </article>
@@ -71,12 +100,14 @@ export default function Post({ post, readingTime }: PostProps): JSX.Element {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query(TODO);
+  const prismic = getPrismicClient();
+  const posts = await prismic.query(
+    Prismic.predicates.at('document.type', 'posts')
+  );
 
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: posts.results.map(post => ({ params: { slug: post.uid } })),
+    fallback: true,
   };
 };
 
@@ -84,22 +115,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', String(params.slug), {});
 
-  const readingTime = Math.round(
-    response.data.content
-      .map(
-        item =>
-          RichText.asText(item.body).split(/\s+/g).length +
-          RichText.asText(item.heading).split(/\s+/g).length
-      )
-      .reduce((acc, value) => acc + value, 0) / 200
-  );
-
   const post: Post = {
-    first_publication_date: format(
-      new Date(response.first_publication_date),
-      'dd MMM yyyy'
-    ),
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
     data: {
+      subtitle: response.data.subtitle,
       banner: {
         url: response.data.banner.url,
       },
@@ -112,7 +132,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post,
-      readingTime,
     },
   };
 };

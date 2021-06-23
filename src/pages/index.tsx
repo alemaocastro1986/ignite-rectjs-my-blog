@@ -2,7 +2,7 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import Prismic from '@prismicio/client';
 import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
@@ -44,10 +44,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               ...res.results.map(post => {
                 return {
                   uid: post.uid,
-                  first_publication_date: format(
-                    new Date(post.first_publication_date),
-                    'dd MMM yyyy'
-                  ),
+                  first_publication_date: post.first_publication_date,
                   data: {
                     title: post.data.title,
                     subtitle: post.data.subtitle,
@@ -72,7 +69,10 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               <div>
                 <time>
                   <FiCalendar size={15} />
-                  {post.first_publication_date}
+                  {format(
+                    parseISO(post.first_publication_date),
+                    'dd MMM yyyy'
+                  ).toLowerCase()}
                 </time>
                 <span>
                   <FiUser size={15} />
@@ -114,10 +114,7 @@ export const getStaticProps: GetStaticProps = async () => {
     results: postsResponse.results.map(post => {
       return {
         uid: post.uid,
-        first_publication_date: format(
-          new Date(post.first_publication_date),
-          'dd MMM yyyy'
-        ),
+        first_publication_date: post.first_publication_date,
         data: {
           title: post.data.title,
           subtitle: post.data.subtitle,
