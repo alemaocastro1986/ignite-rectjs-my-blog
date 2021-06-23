@@ -1,1 +1,71 @@
 // TODO
+.postsContainer {
+  max-width: 700px;
+  width: 100%;
+  margin: 2.5rem auto;
+
+  a {
+    display: block;
+    color: var(--gray-300);
+
+    transition: all 0.2s;
+
+    strong {
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--gray-100);
+    }
+
+    p {
+      margin-top: 0.5rem;
+      line-height: 1.125rem;
+    }
+
+    div {
+      margin-top: 1.825rem;
+      display: flex;
+      align-items: center;
+
+      svg {
+        margin-right: 0.25rem;
+      }
+
+      time {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+      }
+      span {
+        display: flex;
+        align-items: center;
+        // display: inline-block;
+        margin-left: 2rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    &:hover strong {
+      color: var(--pink-500);
+    }
+
+    & + a {
+      margin-top: 3rem;
+    }
+  }
+}
+
+.postPagging {
+  margin-top: 3rem;
+  transition: filter 0.2s;
+
+  button {
+    border: 0;
+    background: transparent;
+    color: var(--pink-500);
+    font-weight: 600;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}

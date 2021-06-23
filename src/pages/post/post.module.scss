@@ -1,1 +1,41 @@
 // TODO
+.banner {
+  margin: 0 auto;
+  img {
+    width: 100%;
+    height: auto;
+    max-height: 25rem;
+  }
+}
+
+.postContent {
+  margin-top: 80px;
+
+  header {
+    color: var(--gray-500);
+    h1 {
+      font-weight: 700;
+      font-size: 3rem;
+      color: var(--gray-100);
+    }
+    ul {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      font-size: 1rem;
+      svg {
+        margin-right: 0.5rem;
+      }
+
+      & + li {
+        margin-left: 1.875rem;
+      }
+    }
+  }
+}
