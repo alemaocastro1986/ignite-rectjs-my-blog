@@ -22,20 +22,27 @@
       margin-top: 1.5rem;
       display: flex;
       align-items: center;
+      li {
+        display: flex;
+        align-items: center;
+        font-weight: normal;
+        font-size: 1rem;
+        svg {
+          margin-right: 0.5rem;
+        }
+
+        & + li {
+          margin-left: 1.875rem;
+        }
+      }
     }
 
-    li {
-      display: flex;
-      align-items: center;
-      font-weight: normal;
-      font-size: 1rem;
-      svg {
-        margin-right: 0.5rem;
-      }
-
-      & + li {
-        margin-left: 1.875rem;
-      }
+    time {
+      display: block;
+      margin-top: 1.125rem;
+      font-weight: 400;
+      font-style: italic;
+      font-size: 0.875rem;
     }
   }
 

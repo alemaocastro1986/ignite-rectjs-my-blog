@@ -18,6 +18,7 @@ import styles from './post.module.scss';
 interface Post {
   uid: string;
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     subtitle: string;
@@ -94,6 +95,14 @@ export default function Post({
                   {String(readingTime)} min
                 </li>
               </ul>
+              {post.last_publication_date && (
+                <time>
+                  {format(
+                    new Date(post.last_publication_date).getTime(),
+                    "'* editado em' dd MMM yyyy', às 'HH:mm"
+                  ).toLowerCase()}
+                </time>
+              )}
             </header>
 
             {post.data.content.map(data => (
@@ -187,6 +196,7 @@ export const getStaticProps: GetStaticProps = async ({
   const post: Post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
     data: {
       subtitle: response.data.subtitle,
       banner: {
