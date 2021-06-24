@@ -1,12 +1,14 @@
+import { Fragment } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 import { format } from 'date-fns';
 import Prismic from '@prismicio/client';
-
 import { RichText } from 'prismic-dom';
-import { Fragment } from 'react';
+
+import { Comments } from '../../components/Comments';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -34,9 +36,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({ post, preview }: PostProps): JSX.Element {
   const { isFallback } = useRouter();
 
   const readingTime = Math.ceil(
@@ -92,6 +95,14 @@ export default function Post({ post }: PostProps): JSX.Element {
                 ))}
               </section>
             ))}
+            <Comments />
+            {preview && (
+              <aside className={commonStyles.preview}>
+                <Link href="/api/exit-preview">
+                  <a>Sair do modo Preview</a>
+                </Link>
+              </aside>
+            )}
           </main>
         </div>
       </article>
@@ -111,9 +122,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('posts', String(params.slug), {});
+  const response = await prismic.getByUID('posts', String(params.slug), {
+    ref: previewData?.ref ?? null,
+  });
 
   const post: Post = {
     uid: response.uid,
@@ -132,6 +149,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post,
+      preview,
     },
   };
 };

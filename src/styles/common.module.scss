@@ -9,3 +9,24 @@
   margin: 0 auto;
   max-width: 700px;
 }
+
+aside.preview {
+  margin-top: 5rem;
+  a {
+    padding: 0.5rem 0;
+    background: var(--gray-100);
+    border-radius: 0.25rem;
+    color: var(--gray-800);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+  }
+}
