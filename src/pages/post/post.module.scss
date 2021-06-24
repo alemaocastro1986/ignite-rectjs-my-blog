@@ -54,3 +54,54 @@
     }
   }
 }
+
+div.paginateContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 3.75rem 0;
+
+  .paginateSeparator {
+    height: 1px;
+    width: 100%;
+    opacity: 0.1;
+    background-color: var(--gray-300);
+    margin-bottom: 3.75rem;
+  }
+
+  .paginateButtons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    a {
+      display: inline-block;
+      border: 1px solid var(--gray-800);
+      border-radius: 0.25rem;
+      max-width: 236px;
+
+      padding: 0.5rem;
+      font-weight: 400;
+      color: var(--gray-100);
+      line-height: 1.5rem;
+
+      transition: border-color 0.2s;
+
+      &:hover {
+        border-color: var(--pink-500);
+      }
+
+      span {
+        display: block;
+        margin-top: 0.5rem;
+        color: var(--pink-500);
+        font-size: 0.875rem;
+        font-weight: 600;
+        font-style: normal;
+      }
+      & + a {
+        margin-left: 2rem;
+        text-align: right;
+      }
+    }
+  }
+}

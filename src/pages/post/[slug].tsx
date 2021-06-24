@@ -34,12 +34,24 @@ interface Post {
   };
 }
 
+interface PostPaginate {
+  title: string;
+  uid: string;
+}
+
 interface PostProps {
   post: Post;
   preview: boolean;
+  prevPost: PostPaginate | undefined;
+  nextPost: PostPaginate | undefined;
 }
 
-export default function Post({ post, preview }: PostProps): JSX.Element {
+export default function Post({
+  post,
+  preview,
+  prevPost,
+  nextPost,
+}: PostProps): JSX.Element {
   const { isFallback } = useRouter();
 
   const readingTime = Math.ceil(
@@ -95,6 +107,29 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
                 ))}
               </section>
             ))}
+
+            <div className={styles.paginateContainer}>
+              <div className={styles.paginateSeparator} />
+              <div className={styles.paginateButtons}>
+                {prevPost.title && (
+                  <Link href={`/post/${prevPost.uid}`}>
+                    <a>
+                      {prevPost.title}
+                      <span>Post anterior</span>
+                    </a>
+                  </Link>
+                )}
+                {nextPost.title && (
+                  <Link href={`/post/${nextPost.uid}`}>
+                    <a>
+                      {nextPost.title}
+                      <span>Próximo post</span>
+                    </a>
+                  </Link>
+                )}
+              </div>
+            </div>
+
             <Comments />
             {preview && (
               <aside className={commonStyles.preview}>
@@ -132,6 +167,23 @@ export const getStaticProps: GetStaticProps = async ({
     ref: previewData?.ref ?? null,
   });
 
+  const prevpost =
+    (
+      await prismic.query(Prismic.Predicates.at('document.type', 'posts'), {
+        pageSize: 1,
+        after: `${response.id}`,
+        orderings: '[document.first_publication_date desc]',
+      })
+    ).results[0] || undefined;
+  const nextpost =
+    (
+      await prismic.query(Prismic.Predicates.at('document.type', 'posts'), {
+        pageSize: 1,
+        after: `${response.id}`,
+        orderings: '[document.first_publication_date]',
+      })
+    ).results[0] || undefined;
+
   const post: Post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
@@ -146,10 +198,25 @@ export const getStaticProps: GetStaticProps = async ({
     },
   };
 
+  const prevPost = prevpost
+    ? {
+        uid: prevpost.uid,
+        title: prevpost.data.title,
+      }
+    : 'undefined';
+  const nextPost = nextpost
+    ? {
+        uid: nextpost.uid,
+        title: nextpost.data.title,
+      }
+    : 'undefined';
+
   return {
     props: {
       post,
       preview,
+      nextPost,
+      prevPost,
     },
   };
 };

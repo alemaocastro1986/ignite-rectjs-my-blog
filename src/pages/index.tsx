@@ -120,7 +120,10 @@ export const getStaticProps: GetStaticProps = async ({
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     Prismic.Predicates.at('document.type', 'posts'),
-    { ref: previewData?.ref ?? null }
+    {
+      orderings: '[document.first_publication_date desc]',
+      ref: previewData?.ref ?? null,
+    }
   );
 
   const postsPagination: PostPagination = {
